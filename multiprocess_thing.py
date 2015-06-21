@@ -34,19 +34,26 @@ def factorial(n):
     return D(result)
 
 
+def f(k):
+    factor = divide(multiply(D(2), sqrt(D(2))), D(9801))
+    return factor
+
+
 def get_ramanujan_term(k):
     k = D(k)
     # print('... ({}) is calculating for n={}'.format(os.getpid(), k))
-    factor = divide(multiply(D(2), sqrt(D(2))), D(9801))
     num = multiply(factorial(4 * k), addition(D(1103), multiply(D(26390), D(k))))
     den = multiply(power(factorial(k), D(4)), power(D(396), multiply(D(4), D(k))))
-    term = divide(multiply(factor, num), den)
+    term = divide(num, den)
     return term
 
 if __name__ == '__main__':
     # start worker processes
     ts = time()
     with Pool(processes=8) as pool:
-        print(1 / reduce(lambda x, y: addition(x, y), pool.map(get_ramanujan_term, range(2048))))
+        factor = divide(multiply(D(2), sqrt(D(2))), D(9801))
+        all_terms = pool.map(get_ramanujan_term, range(2048))
+        the_sum = reduce(lambda x, y: addition(x, y), all_terms)
+        print(1 / multiply(factor, the_sum))
 
     print('Took {}'.format(time() - ts))
