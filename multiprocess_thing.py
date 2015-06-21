@@ -1,7 +1,7 @@
-from multiprocessing import Process, Value, Lock, Pool
-from time import sleep, time
-import os
+from multiprocessing import Pool
+from time import time
 from functools import reduce
+import os
 import decimal
 
 
@@ -32,11 +32,6 @@ def factorial(n):
         result *= n
         n = n - 1
     return D(result)
-
-
-def f(k):
-    factor = divide(multiply(D(2), sqrt(D(2))), D(9801))
-    return factor
 
 
 def get_ramanujan_term(k):
