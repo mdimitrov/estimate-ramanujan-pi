@@ -3,6 +3,7 @@ from time import time
 from functools import reduce
 import os
 import decimal
+import argparse
 
 
 D = decimal.Decimal
@@ -43,11 +44,19 @@ def get_ramanujan_term(k):
     return term
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p', type=int, help='a number of terms')
+    parser.add_argument('-t', type=int, help='a number of processes')
+    args = parser.parse_args()
+
+    if args.p is None:
+        print('precision is  needed')
+
     # start worker processes
     ts = time()
-    with Pool(processes=8) as pool:
+    with Pool(processes=args.t) as pool:
         factor = divide(multiply(D(2), sqrt(D(2))), D(9801))
-        all_terms = pool.map(get_ramanujan_term, range(2048))
+        all_terms = pool.map(get_ramanujan_term, range(args.p))
         the_sum = reduce(lambda x, y: addition(x, y), all_terms)
         print(1 / multiply(factor, the_sum))
 
