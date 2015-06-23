@@ -47,6 +47,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', type=int, help='a number of terms')
     parser.add_argument('-t', type=int, help='a number of processes')
+    parser.add_argument('-o', type=int, help='specify output file')
+    parser.add_argument('-q', type=int, help='quite mode')
     args = parser.parse_args()
 
     if args.p is None:
