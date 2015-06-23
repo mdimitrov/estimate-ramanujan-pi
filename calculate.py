@@ -1,9 +1,10 @@
 from multiprocessing import Pool
 from time import time
+from datetime import datetime
 from functools import reduce
-import os
+from argparser import parser
+from os import getpid
 import decimal
-import argparse
 
 
 D = decimal.Decimal
@@ -27,6 +28,11 @@ def power(x, y): return C.power(x, y)
 def sqrt(x): return C.sqrt(x)
 
 
+def log(message, loud=False):
+    if args.quiet is not True or loud:
+        print(message)
+
+
 def factorial(n):
     result = 1
     while n > 1:
@@ -36,30 +42,32 @@ def factorial(n):
 
 
 def get_ramanujan_term(k):
+    pid = getpid()
+    log('...({}) is calculating term for k={}'.format(pid, k))
     k = D(k)
-    # print('... ({}) is calculating for n={}'.format(os.getpid(), k))
     num = multiply(factorial(4 * k), addition(D(1103), multiply(D(26390), D(k))))
     den = multiply(power(factorial(k), D(4)), power(D(396), multiply(D(4), D(k))))
     term = divide(num, den)
+    log('...({}) is done for k={}'.format(pid, k))
     return term
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-p', type=int, help='a number of terms')
-    parser.add_argument('-t', type=int, help='a number of processes')
-    parser.add_argument('-o', type=int, help='specify output file')
-    parser.add_argument('-q', type=int, help='quite mode')
     args = parser.parse_args()
 
-    if args.p is None:
-        print('precision is  needed')
+    if args.precision is 0:
+        print('default precision 0 will be used')
 
     # start worker processes
     ts = time()
-    with Pool(processes=args.t) as pool:
-        factor = divide(multiply(D(2), sqrt(D(2))), D(9801))
-        all_terms = pool.map(get_ramanujan_term, range(args.p))
-        the_sum = reduce(lambda x, y: addition(x, y), all_terms)
-        print(1 / multiply(factor, the_sum))
+    log('Started at {}'.format(datetime.now()), True)
 
-    print('Took {}'.format(time() - ts))
+    with Pool(processes=args.tasks) as pool:
+        factor = divide(multiply(D(2), sqrt(D(2))), D(9801))
+        all_terms = pool.map(get_ramanujan_term, range(args.precision))
+        the_sum = reduce(lambda x, y: addition(x, y), all_terms)
+
+        with open(args.output_file, 'w') as f:
+            f.write('Pi({}) = {}'.format(args.precision, 1 / multiply(factor, the_sum)))
+
+    log('Finished at {}'.format(datetime.now()), True)
+    log('Took {}'.format(time() - ts), True)
