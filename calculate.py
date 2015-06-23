@@ -54,7 +54,7 @@ def get_ramanujan_term(k):
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    if args.precision is 0:
+    if args.precision is 1:
         print('default precision 0 will be used')
 
     # start worker processes
